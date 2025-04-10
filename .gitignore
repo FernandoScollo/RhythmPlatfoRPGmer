@@ -1,0 +1,56 @@
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de Unity generados automáticamente
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+
+# Archivos de configuración de usuario
+UserSettings/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+
+# Archivos de cache y plugins temporales
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.ide
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+
+# Unity Cloud Build
+.cloud/
+
+# Archivos de crash de Unity
+sysinfo.txt
+
+# Builds de WebGL
+*.jsgz
+*.datagz
+*.unityweb
+*.memgz
+
+# Archivos personalizados opcionales
+# Puedes incluir aquí cualquier carpeta que vos generes y no quieras trackear
