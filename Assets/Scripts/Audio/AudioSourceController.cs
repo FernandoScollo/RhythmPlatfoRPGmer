@@ -12,7 +12,7 @@ public class AudioSourceController : MonoBehaviour
     private void Start()
     {
         MuteSelectedChannels(specialMixerChanel);
-        StartCoroutine(PlayAfterTime(5f));
+        StartCoroutine(PlayAfterTime(1f));
 
     }
 

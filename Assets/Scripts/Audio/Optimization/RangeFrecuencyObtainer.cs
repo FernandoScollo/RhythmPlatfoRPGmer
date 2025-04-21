@@ -2,33 +2,38 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FrecuencyMusicManager : MonoBehaviour
+public class RangeFrecuencyObtainer : MonoBehaviour
 {
-    public SpectrumData spectrum;
+    public AudioSpectrum spectrum;
     public enum FrequencyBands
     {
-        LowBass, Bass, MidBass ,Mid, MidHigh, HighMid, High
+        LowBass, Bass, MidBass, Mid, MidHigh, HighMid, High
     }
     //Cantidad de Bandas
     public FrequencyBands[] freqBands;
     //Valor para las frecuencias de banda
-    public List <float> frequencyBandsValue;
-    public List <float> frequencyBandsMax;
+    private List<float> frequencyBandsValue = new List<float>();
+    private List<float> frequencyBandsMax = new List<float>();
     //Sumarle un valor de base para que no haya valores menores a 0
     public bool baseValueEnabled;
     public float baseValue;
     // Esto modifica si es false valores Peak, si true valores con buffer
     public bool withBuffer;
 
+    // Rhythm Platformer
+    public float totalFqValues;
+    public float threshold = 2f;
+
     private void Start()
     {
-        
-        for (int i=0; i<freqBands.Length; i++)
+        spectrum = GetComponent<AudioSpectrum>();
+        for (int i = 0; i < freqBands.Length; i++)
         {
             frequencyBandsValue.Add(0f);
             frequencyBandsMax.Add(0f);
         }
     }
+    
     public void GetFrequencyBandsBuffer()
     {
         for (int i = 0; i < freqBands.Length; i++)
@@ -128,7 +133,7 @@ public class FrecuencyMusicManager : MonoBehaviour
                 case FrequencyBands.High:
                     if (baseValueEnabled)
                     {
-                        frequencyBandsValue[i] = spectrum.bandBuffer[6]+ spectrum.bandBuffer[7] + baseValue;
+                        frequencyBandsValue[i] = spectrum.bandBuffer[6] + spectrum.bandBuffer[7] + baseValue;
                         if (frequencyBandsValue[i] > frequencyBandsMax[i])
                             frequencyBandsMax[i] = frequencyBandsValue[i];
                         break;
@@ -261,9 +266,32 @@ public class FrecuencyMusicManager : MonoBehaviour
     }
     private void Update()
     {
-        if(withBuffer)
-        GetFrequencyBandsBuffer();
+        if (withBuffer)
+            GetFrequencyBandsBuffer();
         else
-        GetFrequencyBands();
+            GetFrequencyBands();
     }
+
+    private void FixedUpdate()
+    {
+        GetTotalFqValues();
+    }
+
+    public void GetTotalFqValues()
+    {
+        totalFqValues = 0;
+        for (int i = 0; i < frequencyBandsValue.Count; i++)
+        {
+            totalFqValues += frequencyBandsValue[i];
+        }
+    }
+
+    public bool SoundON()
+    {
+        if (totalFqValues > threshold)
+            return true;
+        else
+            return false;
+    }
+    
 }
