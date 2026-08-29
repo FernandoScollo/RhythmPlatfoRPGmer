@@ -24,9 +24,8 @@ public class PlayerAttack : MonoBehaviour
         animations.SetTrigger("attack");
         cooldownTimer = 0;
         // Pool Fireballs
-        int fireballNumber = FindFireball();
-        fireBalls[fireballNumber].transform.position = firePoint.position;
-        fireBalls[fireballNumber].GetComponent<Projectile>().SetDirection(Mathf.Sign(transform.localScale.x));
+        fireBalls[FindFireball()].transform.position = firePoint.position;
+        fireBalls[FindFireball()].GetComponent<Projectile>().SetDirection(Mathf.Sign(transform.localScale.x));
     }
     private int FindFireball()
     {

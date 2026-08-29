@@ -7,9 +7,11 @@ public class Projectile : MonoBehaviour
     [SerializeField] private float speed;
     private float direction;
     private bool hit;
+    private float lifeTime;
+
     private BoxCollider2D boxCollider;
     private Animator animations;
-    private float lifeTime;
+
     // Start is called before the first frame update
     void Awake()
     {

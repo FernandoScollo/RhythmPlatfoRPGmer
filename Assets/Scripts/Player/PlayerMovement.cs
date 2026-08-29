@@ -51,14 +51,31 @@ public class PlayerMovement : MonoBehaviour
 
             if (onWall() && !isGrounded())
             {
-                body.gravityScale = 0;
-                body.velocity = Vector2.zero;
+                // ¿Está presionando hacia la pared?
+                bool pressingTowardsWall = (horizontalInput > 0 && transform.localScale.x > 0) ||
+                                           (horizontalInput < 0 && transform.localScale.x < 0);
+
+                if (pressingTowardsWall)
+                {
+                    body.gravityScale = 0;
+                    body.velocity = Vector2.zero;
+                }
+                else
+                {
+                    body.gravityScale = jumpGravity;
+                }
             }
             else
+            {
                 body.gravityScale = jumpGravity;
+            }
 
             if (Input.GetKey(KeyCode.Space))
+            {
+               
                 Jump();
+            }
+                
         }
         else
             wallJumpCooldown += Time.deltaTime;
@@ -68,11 +85,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isGrounded())
         {
+            Debug.Log("Entro aca? isGrounded");
             body.velocity = new Vector2(body.velocity.x, jumpPower);
             anim.SetTrigger("jump");
         }
         else if (onWall() && !isGrounded())
         {
+            Debug.Log("Entro aca?onWall !isGrounded");
             if (horizontalInput == 0)
             {
                 body.velocity = new Vector2(-Mathf.Sign(transform.localScale.x) * wallJumpForce, 0);

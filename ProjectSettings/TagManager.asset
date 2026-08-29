@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Rhythm Platform
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -17,9 +18,9 @@ TagManager:
   - Walls
   - RhythmPlatform A
   - RhythmPlatform B
-  - 
-  - 
-  - 
+  - RhythmPlatform C
+  - Player
+  - Enemy
   - 
   - 
   - 
@@ -48,6 +49,12 @@ TagManager:
     locked: 0
   - name: Background 2
     uniqueID: 44475413
+    locked: 0
+  - name: Foreground
+    uniqueID: 2417617303
+    locked: 0
+  - name: Ground
+    uniqueID: 2045027959
     locked: 0
   - name: Props
     uniqueID: 1022884873
