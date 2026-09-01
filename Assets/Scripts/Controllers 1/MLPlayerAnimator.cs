@@ -52,49 +52,63 @@ public class MLPlayerAnimator : MonoBehaviour
 
     private void OnEnable()
     {
-        // Player Movement
         if (playerMovement != null)
         {
             playerMovement.OnJump.AddListener(HandleJump);
             playerMovement.OnLand.AddListener(HandleLand);
         }
 
-        // Guitar Dash
         if (guitarDashSkill != null)
         {
-            guitarDashSkill.OnDashStarted.AddListener(HandleGuitarDashStarted);
-            guitarDashSkill.OnDashFinished.AddListener(HandleGuitarDashFinished);
+            guitarDashSkill.OnDashStarted.AddListener(
+                HandleGuitarDashStarted
+            );
+
+            guitarDashSkill.OnDashFinished.AddListener(
+                HandleGuitarDashFinished
+            );
         }
 
-        // Bombo Dash
         if (bomboDashSkill != null)
         {
-            bomboDashSkill.OnDashStarted.AddListener(HandleBomboDashStarted);
-            bomboDashSkill.OnDashFinished.AddListener(HandleBomboDashFinished);
+            bomboDashSkill.OnDashStarted.AddListener(
+                HandleBomboDashStarted
+            );
+
+            bomboDashSkill.OnDashFinished.AddListener(
+                HandleBomboDashFinished
+            );
         }
     }
 
     private void OnDisable()
     {
-        // Player Movement
         if (playerMovement != null)
         {
             playerMovement.OnJump.RemoveListener(HandleJump);
             playerMovement.OnLand.RemoveListener(HandleLand);
         }
 
-        // Guitar Dash
         if (guitarDashSkill != null)
         {
-            guitarDashSkill.OnDashStarted.RemoveListener(HandleGuitarDashStarted);
-            guitarDashSkill.OnDashFinished.RemoveListener(HandleGuitarDashFinished);
+            guitarDashSkill.OnDashStarted.RemoveListener(
+                HandleGuitarDashStarted
+            );
+
+            guitarDashSkill.OnDashFinished.RemoveListener(
+                HandleGuitarDashFinished
+            );
         }
 
-        // Bombo Dash
         if (bomboDashSkill != null)
         {
-            bomboDashSkill.OnDashStarted.RemoveListener(HandleBomboDashStarted);
-            bomboDashSkill.OnDashFinished.RemoveListener(HandleBomboDashFinished);
+            bomboDashSkill.OnDashStarted.RemoveListener(
+                HandleBomboDashStarted
+            );
+
+            bomboDashSkill.OnDashFinished.RemoveListener(
+                HandleBomboDashFinished
+            );
         }
     }
 
@@ -128,7 +142,6 @@ public class MLPlayerAnimator : MonoBehaviour
             {
                 guitarDashAnimationFinished = true;
 
-                // Freeze on last frame
                 animator.speed = 0f;
             }
 
@@ -168,7 +181,6 @@ public class MLPlayerAnimator : MonoBehaviour
             {
                 bomboDashAnimationFinished = true;
 
-                // Freeze on last frame
                 animator.speed = 0f;
             }
 
@@ -254,7 +266,6 @@ public class MLPlayerAnimator : MonoBehaviour
 
     private void HandleJump()
     {
-        // No interrumpir un dash
         if (IsDashing())
             return;
 
@@ -267,7 +278,6 @@ public class MLPlayerAnimator : MonoBehaviour
 
     private void HandleLand()
     {
-        // No interrumpir un dash
         if (IsDashing())
             return;
 
@@ -280,8 +290,8 @@ public class MLPlayerAnimator : MonoBehaviour
 
     private void HandleGuitarDashStarted()
     {
-        // Seguridad
-        if (bomboDashSkill != null && bomboDashSkill.IsDashing)
+        if (bomboDashSkill != null &&
+            bomboDashSkill.IsDashing)
             return;
 
         guitarDashAnimationFinished = false;
@@ -310,8 +320,8 @@ public class MLPlayerAnimator : MonoBehaviour
 
     private void HandleBomboDashStarted()
     {
-        // Seguridad
-        if (guitarDashSkill != null && guitarDashSkill.IsDashing)
+        if (guitarDashSkill != null &&
+            guitarDashSkill.IsDashing)
             return;
 
         bomboDashAnimationFinished = false;
@@ -341,9 +351,19 @@ public class MLPlayerAnimator : MonoBehaviour
     private void GoToGroundAnimation()
     {
         if (playerMovement.IsMoving)
-            PlayAnimation(walkState, landTransitionDuration);
+        {
+            PlayAnimation(
+                walkState,
+                landTransitionDuration
+            );
+        }
         else
-            PlayAnimation(idleState, landTransitionDuration);
+        {
+            PlayAnimation(
+                idleState,
+                landTransitionDuration
+            );
+        }
     }
 
     // =====================================================
@@ -369,10 +389,16 @@ public class MLPlayerAnimator : MonoBehaviour
 
     private void PlayAnimation(string stateName)
     {
-        PlayAnimation(stateName, transitionDuration);
+        PlayAnimation(
+            stateName,
+            transitionDuration
+        );
     }
 
-    private void PlayAnimation(string stateName, float duration)
+    private void PlayAnimation(
+        string stateName,
+        float duration
+    )
     {
         if (currentState == stateName)
             return;

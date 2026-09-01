@@ -4,92 +4,425 @@ using UnityEngine;
 
 public class RhythmPlatformController : MonoBehaviour
 {
-    public RhythmPlatform kick;
-    public RhythmPlatform snare;
-    public RhythmPlatform channelC;
-    // Plataformas A
-    [SerializeField] List<SpriteRenderer> platformASpt;
-    [SerializeField] List<SpriteRenderer> platformBSpt;
-    // Plataformas B
-    [SerializeField] List<BoxCollider2D> platformACld;
-    [SerializeField] List<BoxCollider2D> platformBCld;
-    // Plataformas C
-    [SerializeField] List<SpriteRenderer> platformCSpt;
-    [SerializeField] List<BoxCollider2D> platformCCld;
+    public static RhythmPlatformController Instance;
 
+    [Header("Frequency Detection")]
+    public RangeFrecuencyObtainer kick;
+    public RangeFrecuencyObtainer snare;
+    public RangeFrecuencyObtainer channelC;
 
-    public bool platformABlocked, platformBBlocked;
+    // =====================================================
+    // PLATFORMS A
+    // =====================================================
+
+    [Header("Platforms A")]
+    [SerializeField] private List<GameObject> A_Platforms;
+
+    // =====================================================
+    // PLATFORMS B
+    // =====================================================
+
+    [Header("Platforms B")]
+    [SerializeField] private List<GameObject> B_Platforms;
+
+    // =====================================================
+    // PLATFORMS C
+    // =====================================================
+
+    [Header("Platforms C")]
+    [SerializeField] private List<GameObject> C_Platforms;
+
+    // =====================================================
+    // STATES
+    // =====================================================
+
+    public bool platformABlocked;
+    public bool platformBBlocked;
+
+    private bool platformsAActive;
+    private bool platformsBActive;
+    private bool platformsCActive;
+
+    // =====================================================
+    // AWAKE
+    // =====================================================
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // =====================================================
+    // START
+    // =====================================================
 
     private void Start()
     {
         InitiatePlatforms();
     }
 
+    // =====================================================
+    // FIXED UPDATE
+    // =====================================================
+
     private void FixedUpdate()
     {
         ManagePlatforms();
     }
 
-    void InitiatePlatforms()
+    // =====================================================
+    // INITIALIZE
+    // =====================================================
+
+    private void InitiatePlatforms()
     {
         PlatformsAState(false);
         PlatformsBState(false);
         PlatformsCState(false);
+
+        platformsAActive = false;
+        platformsBActive = false;
+        platformsCActive = false;
     }
+
+    // =====================================================
+    // MANAGE PLATFORMS
+    // =====================================================
 
     public void ManagePlatforms()
     {
-        if(kick.SoundON())
+        // =================================================
+        // KICK → A
+        // =================================================
+
+        if (kick.SoundON())
         {
             PlatformsAState(true);
             PlatformsBState(false);
+
             platformABlocked = true;
             platformBBlocked = false;
         }
-        if (snare.SoundON())
+
+        // =================================================
+        // SNARE → B
+        // =================================================
+
+        else if (snare.SoundON())
         {
             PlatformsAState(false);
             PlatformsBState(true);
+
             platformABlocked = false;
             platformBBlocked = true;
         }
+
+        // =================================================
+        // CHANNEL C → C
+        // =================================================
+
         if (channelC.SoundON())
+        {
             PlatformsCState(true);
+        }
         else
+        {
             PlatformsCState(false);
+        }
     }
+
+    // =====================================================
+    // PLATFORMS A
+    // =====================================================
 
     public void PlatformsAState(bool isActive)
     {
-        foreach (SpriteRenderer spritesA in platformASpt)
+        // -----------------------------------------------
+        // OFF → ON
+        // -----------------------------------------------
+
+        if (isActive && !platformsAActive)
         {
-            spritesA.enabled = isActive;
+            foreach (GameObject platform in A_Platforms)
+            {
+                RhythmPlatforms ejection =
+                    platform.GetComponent<RhythmPlatforms>();
+
+                bool isEjecting = false;
+
+                if (ejection != null)
+                {
+                    isEjecting =
+                        ejection.PrepareForActivation();
+                }
+
+                // Sprite siempre aparece inmediatamente
+                SpriteRenderer sprite =
+                    platform.GetComponent<SpriteRenderer>();
+
+                if (sprite != null)
+                {
+                    sprite.enabled = true;
+                }
+
+                // Si no hay expulsión, activamos collider
+                // inmediatamente.
+                if (!isEjecting)
+                {
+                    BoxCollider2D collider =
+                        platform.GetComponent<BoxCollider2D>();
+
+                    if (collider != null)
+                    {
+                        collider.enabled = true;
+                    }
+                }
+            }
         }
-        foreach (BoxCollider2D CollidersA in platformACld)
+
+        // -----------------------------------------------
+        // ON → OFF
+        // -----------------------------------------------
+
+        if (!isActive && platformsAActive)
         {
-            CollidersA.enabled = isActive;
+            foreach (GameObject platform in A_Platforms)
+            {
+                RhythmPlatforms ejection =
+                    platform.GetComponent<RhythmPlatforms>();
+
+                if (ejection != null)
+                {
+                    ejection.ResetActivation();
+                }
+
+                SpriteRenderer sprite =
+                    platform.GetComponent<SpriteRenderer>();
+
+                if (sprite != null)
+                {
+                    sprite.enabled = false;
+                }
+
+                BoxCollider2D collider =
+                    platform.GetComponent<BoxCollider2D>();
+
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
+            }
         }
+
+        platformsAActive = isActive;
     }
+
+    // =====================================================
+    // PLATFORMS B
+    // =====================================================
+
     public void PlatformsBState(bool isActive)
     {
-        foreach (SpriteRenderer spritesB in platformBSpt)
+        // -----------------------------------------------
+        // OFF → ON
+        // -----------------------------------------------
+
+        if (isActive && !platformsBActive)
         {
-            spritesB.enabled = isActive;
+            foreach (GameObject platform in B_Platforms)
+            {
+                RhythmPlatforms ejection =
+                    platform.GetComponent<RhythmPlatforms>();
+
+                bool isEjecting = false;
+
+                if (ejection != null)
+                {
+                    isEjecting =
+                        ejection.PrepareForActivation();
+                }
+
+                SpriteRenderer sprite =
+                    platform.GetComponent<SpriteRenderer>();
+
+                if (sprite != null)
+                {
+                    sprite.enabled = true;
+                }
+
+                if (!isEjecting)
+                {
+                    BoxCollider2D collider =
+                        platform.GetComponent<BoxCollider2D>();
+
+                    if (collider != null)
+                    {
+                        collider.enabled = true;
+                    }
+                }
+            }
         }
-        foreach (BoxCollider2D CollidersB in platformBCld)
+
+        // -----------------------------------------------
+        // ON → OFF
+        // -----------------------------------------------
+
+        if (!isActive && platformsBActive)
         {
-            CollidersB.enabled = isActive;
+            foreach (GameObject platform in B_Platforms)
+            {
+                RhythmPlatforms ejection =
+                    platform.GetComponent<RhythmPlatforms>();
+
+                if (ejection != null)
+                {
+                    ejection.ResetActivation();
+                }
+
+                SpriteRenderer sprite =
+                    platform.GetComponent<SpriteRenderer>();
+
+                if (sprite != null)
+                {
+                    sprite.enabled = false;
+                }
+
+                BoxCollider2D collider =
+                    platform.GetComponent<BoxCollider2D>();
+
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
+            }
         }
+
+        platformsBActive = isActive;
     }
+
+    // =====================================================
+    // PLATFORMS C
+    // =====================================================
+
     public void PlatformsCState(bool isActive)
     {
-        foreach (SpriteRenderer spritesC in platformCSpt)
+        // -----------------------------------------------
+        // OFF → ON
+        // -----------------------------------------------
+
+        if (isActive && !platformsCActive)
         {
-            spritesC.enabled = isActive;
+            foreach (GameObject platform in C_Platforms)
+            {
+                RhythmPlatforms ejection =
+                    platform.GetComponent<RhythmPlatforms>();
+
+                bool isEjecting = false;
+
+                if (ejection != null)
+                {
+                    isEjecting =
+                        ejection.PrepareForActivation();
+                }
+
+                SpriteRenderer sprite =
+                    platform.GetComponent<SpriteRenderer>();
+
+                if (sprite != null)
+                {
+                    sprite.enabled = true;
+                }
+
+                if (!isEjecting)
+                {
+                    BoxCollider2D collider =
+                        platform.GetComponent<BoxCollider2D>();
+
+                    if (collider != null)
+                    {
+                        collider.enabled = true;
+                    }
+                }
+            }
         }
-        foreach (BoxCollider2D CollidersC in platformCCld)
+
+        // -----------------------------------------------
+        // ON → OFF
+        // -----------------------------------------------
+
+        if (!isActive && platformsCActive)
         {
-            CollidersC.enabled = isActive;
+            foreach (GameObject platform in C_Platforms)
+            {
+                RhythmPlatforms ejection =
+                    platform.GetComponent<RhythmPlatforms>();
+
+                if (ejection != null)
+                {
+                    ejection.ResetActivation();
+                }
+
+                SpriteRenderer sprite =
+                    platform.GetComponent<SpriteRenderer>();
+
+                if (sprite != null)
+                {
+                    sprite.enabled = false;
+                }
+
+                BoxCollider2D collider =
+                    platform.GetComponent<BoxCollider2D>();
+
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
+            }
+        }
+
+        platformsCActive = isActive;
+    }
+
+    // =====================================================
+    // ADD PLATFORM A
+    // =====================================================
+
+    public void AddAPlatform(GameObject platform)
+    {
+        if (!A_Platforms.Contains(platform))
+        {
+            A_Platforms.Add(platform);
+        }
+    }
+
+    // =====================================================
+    // ADD PLATFORM B
+    // =====================================================
+
+    public void AddBPlatform(GameObject platform)
+    {
+        if (!B_Platforms.Contains(platform))
+        {
+            B_Platforms.Add(platform);
+        }
+    }
+
+    // =====================================================
+    // ADD PLATFORM C
+    // =====================================================
+
+    public void AddCPlatform(GameObject platform)
+    {
+        if (!C_Platforms.Contains(platform))
+        {
+            C_Platforms.Add(platform);
         }
     }
 

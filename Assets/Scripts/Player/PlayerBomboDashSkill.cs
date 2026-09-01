@@ -7,6 +7,7 @@ public class PlayerBomboDashSkill : MonoBehaviour
     [Header("Dash")]
     [SerializeField] private KeyCode dashKey = KeyCode.K;
     [SerializeField] private float dashForce = 12f;
+    [SerializeField] private float verticalDashForce = 4f;
     [SerializeField] private float dashDuration = 0.15f;
     [SerializeField] private float dashBrakeStrength = 50f;
 
@@ -29,7 +30,7 @@ public class PlayerBomboDashSkill : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(dashKey) && !isDashing)
+        if (Input.GetKeyDown(dashKey) && !isDashing && !playerMovement.IsDashActive)
         {
             StartCoroutine(Dash());
         }
@@ -49,7 +50,7 @@ public class PlayerBomboDashSkill : MonoBehaviour
         // Velocidad inicial del dash
         body.velocity = new Vector2(
             dashDirection * dashForce,
-            body.velocity.y
+            body.velocity.y + verticalDashForce
         );
 
         float elapsedTime = 0f;

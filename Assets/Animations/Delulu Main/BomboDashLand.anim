@@ -189,7 +189,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0, y: 0, z: 191.285}
+        value: {x: 0, y: 0, z: -148.99}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -214,7 +214,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0, y: 0, z: -162.396}
+        value: {x: 0, y: 0, z: -105.609}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -239,7 +239,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0, y: 0, z: -74.346}
+        value: {x: 0, y: 0, z: -80.063}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -1593,7 +1593,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 191.285
+        value: -148.99
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -1677,7 +1677,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -162.396
+        value: -105.609
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -1745,7 +1745,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -74.346
+        value: -80.063
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -3289,6 +3289,36 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
+    path: Body/Espina/Torso/Props/Guitarra 1/bone_1/bone_2/bone_3
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.y
+    path: Body/Espina/Torso/Props/Guitarra 1/bone_1/bone_2/bone_3
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.x
+    path: Body/Espina/Torso/Props/Guitarra 1/bone_1/bone_2/bone_3
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.z
     path: Body/Espina/Torso/Brazo Der/Brazo Derecho
     classID: 4
     script: {fileID: 0}
@@ -3340,39 +3370,6 @@ AnimationClip:
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
     path: Body/Espina/Torso/Brazo Der/Brazo Derecho/Ante Brazo Der/Ante-Brazo Derecho
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.z
-    path: Body/Espina/Torso/Brazo Der/Brazo Derecho/Ante Brazo Der/Ante-Brazo Derecho/Mano
-      Der/Mano Derecha
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.y
-    path: Body/Espina/Torso/Brazo Der/Brazo Derecho/Ante Brazo Der/Ante-Brazo Derecho/Mano
-      Der/Mano Derecha
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.x
-    path: Body/Espina/Torso/Brazo Der/Brazo Derecho/Ante Brazo Der/Ante-Brazo Derecho/Mano
-      Der/Mano Derecha
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -3571,7 +3568,8 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Body/Espina/Torso/Props/Guitarra 1/bone_1/bone_2/bone_3
+    path: Body/Espina/Torso/Brazo Der/Brazo Derecho/Ante Brazo Der/Ante-Brazo Derecho/Mano
+      Der/Mano Derecha
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -3581,7 +3579,8 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Body/Espina/Torso/Props/Guitarra 1/bone_1/bone_2/bone_3
+    path: Body/Espina/Torso/Brazo Der/Brazo Derecho/Ante Brazo Der/Ante-Brazo Derecho/Mano
+      Der/Mano Derecha
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -3591,7 +3590,8 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Body/Espina/Torso/Props/Guitarra 1/bone_1/bone_2/bone_3
+    path: Body/Espina/Torso/Brazo Der/Brazo Derecho/Ante Brazo Der/Ante-Brazo Derecho/Mano
+      Der/Mano Derecha
     classID: 4
     script: {fileID: 0}
   m_HasGenericRootTransform: 0

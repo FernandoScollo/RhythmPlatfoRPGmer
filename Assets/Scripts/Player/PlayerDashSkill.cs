@@ -7,6 +7,7 @@ public class PlayerDashSkill : MonoBehaviour
 {
     [Header("Dash")]
     [SerializeField] private float dashForce = 12f;
+    [SerializeField] private float verticalDashForce = 2f;
     [SerializeField] private float dashDuration = 0.15f;
     [SerializeField] private float dashBrakeStrength = 50f;
 
@@ -29,7 +30,7 @@ public class PlayerDashSkill : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.J) && !isDashing)
+        if (Input.GetKeyDown(KeyCode.J) && !isDashing && !playerMovement.IsDashActive)
         {
             StartCoroutine(Dash());
         }
@@ -49,7 +50,7 @@ public class PlayerDashSkill : MonoBehaviour
         // Velocidad inicial del dash
         body.velocity = new Vector2(
             dashDirection * dashForce,
-            body.velocity.y
+            body.velocity.y + verticalDashForce
         );
 
         float elapsedTime = 0f;

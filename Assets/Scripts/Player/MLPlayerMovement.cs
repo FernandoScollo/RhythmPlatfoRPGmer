@@ -8,10 +8,7 @@ public class MLPlayerMovement : MonoBehaviour
     [Header("Movements")]
     [SerializeField] private float speed;
     [SerializeField] private float jumpPower;
-    [SerializeField] private float wallJumpCooldown;
-    [SerializeField] private float wallJumpForce;
     [SerializeField] private float jumpGravity;
-    [SerializeField] private float wallJumpGravity;
 
     [Header("Collision Layers")]
     [SerializeField] private LayerMask groundLayer;
@@ -33,15 +30,15 @@ public class MLPlayerMovement : MonoBehaviour
     // Estados públicos para otros sistemas
     public bool IsGrounded { get; private set; }
 
-    public bool IsDashActive { get; private set; }
-
-
-
     public bool IsMoving =>
         Mathf.Abs(horizontalInput) > 0.01f;
 
     public float HorizontalInput =>
         horizontalInput;
+
+    // El Dash utiliza esto para tomar temporalmente
+    // el control de la velocidad horizontal.
+    public bool IsDashActive { get; private set; }
 
     private void Awake()
     {
@@ -52,11 +49,6 @@ public class MLPlayerMovement : MonoBehaviour
 
         IsGrounded = isGrounded();
         wasGrounded = IsGrounded;
-    }
-
-    public void SetDashActive(bool active)
-    {
-        IsDashActive = active;
     }
 
     private void Update()
@@ -74,63 +66,46 @@ public class MLPlayerMovement : MonoBehaviour
 
         wasGrounded = IsGrounded;
 
-        // Flip player when moving left-right
+        // Flip player cuando se mueve
         if (horizontalInput > 0.01f)
         {
             transform.localScale = new Vector3(
                 innitialLocalScaleX,
-                innitialLocalScaleX,
-                innitialLocalScaleX
+                transform.localScale.y,
+                transform.localScale.z
             );
         }
         else if (horizontalInput < -0.01f)
         {
             transform.localScale = new Vector3(
                 -innitialLocalScaleX,
-                innitialLocalScaleX,
-                innitialLocalScaleX
+                transform.localScale.y,
+                transform.localScale.z
             );
         }
 
-        // Wall jump logic
-        if (wallJumpCooldown > 0.2f)
+        // Movimiento horizontal
+        if (!IsDashActive)
         {
-            if (!IsDashActive)
-            {
-                body.velocity = new Vector2(
-                horizontalInput * speed,
-                body.velocity.y);
-            }
+            float horizontalVelocity = horizontalInput * speed;
 
-            if (onWall() && !IsGrounded)
+            if (IsOnWall())
             {
-                bool pressingTowardsWall =
-                    (horizontalInput > 0 && transform.localScale.x > 0) ||
-                    (horizontalInput < 0 && transform.localScale.x < 0);
-
-                if (pressingTowardsWall)
-                {
-                    body.gravityScale = 0;
-                    body.velocity = Vector2.zero;
-                }
-                else
-                {
-                    body.gravityScale = jumpGravity;
-                }
+                horizontalVelocity = 0f;
             }
-            else
-            {
-                body.gravityScale = jumpGravity;
-            }
-
-            if (Input.GetKey(KeyCode.Space))
-            {
-                Jump();
-            }
+            body.velocity = new Vector2(
+                horizontalVelocity,
+                body.velocity.y
+            );
         }
-        else
+
+        // Gravedad
+        body.gravityScale = jumpGravity;
+
+        // Salto
+        if (Input.GetKey(KeyCode.Space))
         {
-            wallJumpCooldown += Time.deltaTime;
+            Jump();
         }
     }
 
@@ -142,33 +117,6 @@ public class MLPlayerMovement : MonoBehaviour
                 body.velocity.x,
                 jumpPower
             );
-
-            OnJump?.Invoke();
-        }
-        else if (onWall() && !IsGrounded)
-        {
-            if (horizontalInput == 0)
-            {
-                body.velocity = new Vector2(
-                    -Mathf.Sign(transform.localScale.x) * wallJumpForce,
-                    0
-                );
-
-                transform.localScale = new Vector3(
-                    -Mathf.Sign(transform.localScale.x),
-                    transform.localScale.y,
-                    transform.localScale.z
-                );
-            }
-            else
-            {
-                body.velocity = new Vector2(
-                    -Mathf.Sign(transform.localScale.x) * 3,
-                    wallJumpForce
-                );
-            }
-
-            wallJumpCooldown = 0;
 
             OnJump?.Invoke();
         }
@@ -188,24 +136,30 @@ public class MLPlayerMovement : MonoBehaviour
         return raycastHit.collider != null;
     }
 
-    private bool onWall()
+    public void SetDashActive(bool active)
     {
-        RaycastHit2D raycastHit = Physics2D.BoxCast(
-            boxCollider.bounds.center,
-            boxCollider.bounds.size,
-            0,
-            new Vector2(transform.localScale.x, 0),
-            0.1f,
-            wallLayer
-        );
-
-        return raycastHit.collider != null;
+        IsDashActive = active;
     }
 
     public bool CanAttack()
     {
-        return !IsMoving &&
-               IsGrounded &&
-               !onWall();
+        return !IsMoving && IsGrounded;
+    }
+
+    private bool IsOnWall()
+    {
+        if (Mathf.Abs(horizontalInput) < 0.01f)
+            return false;
+
+        RaycastHit2D hit = Physics2D.BoxCast(
+            boxCollider.bounds.center,
+            boxCollider.bounds.size,
+            0,
+            Vector2.right * Mathf.Sign(horizontalInput),
+            0.05f,
+            wallLayer
+        );
+
+        return hit.collider != null;
     }
 }

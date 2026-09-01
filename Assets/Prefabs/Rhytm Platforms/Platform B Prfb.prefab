@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2225381852975253536}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.11}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 37.36591, y: 36.104965, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 26.88, y: -64.84494}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0.1822, y: 0.2025}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2224075654181836227
@@ -142,6 +142,8 @@ GameObject:
   - component: {fileID: 8879671522707979634}
   - component: {fileID: 8879671522707979597}
   - component: {fileID: 8879671522707979596}
+  - component: {fileID: 1400023507984719505}
+  - component: {fileID: 5368531177113193186}
   m_Layer: 6
   m_Name: Platform B
   m_TagString: Rhythm Platform
@@ -157,7 +159,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8879671522707979599}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 26.85, y: -64.90001, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -242,3 +244,35 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 5.12, y: 5.12}
   m_EdgeRadius: 0
+--- !u!114 &1400023507984719505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8879671522707979599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a06f4a7ff54d29344bbbde790efeaa84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  APlatform: 0
+  BPlatform: 1
+  CPlatform: 0
+--- !u!114 &5368531177113193186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8879671522707979599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ca956d66fa52a4d92c35d81de5c15e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  platformCollider: {fileID: 0}
+  player: {fileID: 0}
+  ejectionDuration: 0.07
+  pushSpeed: 8
+  exitMargin: 0.2
