@@ -1,0 +1,11 @@
+<Project>
+  <Import Project="..\RhythmFreeze\Validation.targets" />
+  <ItemGroup>
+    <Compile Remove="$(MSBuildProjectDirectory)\Assets\Scripts\Enemies\ProjectilShooter.cs;Assets\Scripts\Enemies\ProjectilShooter.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\Assets\Scripts\Enemies\ProjectilePool.cs;Assets\Scripts\Enemies\ProjectilePool.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\Assets\Scripts\Enemies\HomingProjectile.cs;Assets\Scripts\Enemies\HomingProjectile.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Assets\Scripts\Enemies\ProjectilShooter.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Assets\Scripts\Enemies\ProjectilePool.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Assets\Scripts\Enemies\HomingProjectile.cs" />
+  </ItemGroup>
+</Project>

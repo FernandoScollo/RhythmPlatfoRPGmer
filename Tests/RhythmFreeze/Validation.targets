@@ -1,0 +1,10 @@
+<Project>
+  <Target Name="UseUnityCompiledReferences" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <ReferencePath Remove="@(ReferencePath)" Condition="!Exists('%(ReferencePath.Identity)')" />
+      <ReferencePath Include="$(MSBuildProjectDirectory)\Library\ScriptAssemblies\*.dll" Exclude="$(MSBuildProjectDirectory)\Library\ScriptAssemblies\Assembly-CSharp*.dll" />
+      <ReferencePathWithRefAssemblies Remove="@(ReferencePathWithRefAssemblies)" Condition="!Exists('%(ReferencePathWithRefAssemblies.Identity)')" />
+      <ReferencePathWithRefAssemblies Include="$(MSBuildProjectDirectory)\Library\ScriptAssemblies\*.dll" Exclude="$(MSBuildProjectDirectory)\Library\ScriptAssemblies\Assembly-CSharp*.dll" />
+    </ItemGroup>
+  </Target>
+</Project>

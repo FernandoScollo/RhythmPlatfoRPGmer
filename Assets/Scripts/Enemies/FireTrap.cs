@@ -32,7 +32,16 @@ public class FireTrap : MonoBehaviour
             }
             if(active)
             {
-                collision.GetComponent<Health>().TakeDamage(damage);
+                MLHealth mlHealth = collision.GetComponentInParent<MLHealth>();
+
+                if (mlHealth != null)
+                {
+                    mlHealth.TakeDamage(damage);
+                }
+                else
+                {
+                    collision.GetComponentInParent<Health>()?.TakeDamage(damage);
+                }
             }
         }
     }

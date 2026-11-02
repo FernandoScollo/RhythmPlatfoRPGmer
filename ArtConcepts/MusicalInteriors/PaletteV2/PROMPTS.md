@@ -1,0 +1,7 @@
+# Recoloración — paleta adjunta
+
+Cuatro variantes creadas con la herramienta integrada de generación de imágenes. Originales conservados. Referencia: codex-clipboard-8a490067-4a3e-41f9-b137-a39bb61b7d55.png. Colores interpretados visualmente de la fotografía, no una indexación exacta. Verificar recorte, uniones y bordes antes de Unity.
+
+## Prompt aplicado a cada plancha
+
+Use case: precise-object-edit. PALETTE RECOLOR ONLY. Image 1 is the existing tileset to EDIT; image 2 is the authoritative color palette reference. Preserve EXACTLY the twelve modules, positions, proportions, all outlines, window shapes, musical staff engravings, orthographic front view and architectural details of image 1. Recolor to the hand-painted swatches of image 2, IGNORING the gray paper background: muted lemon/mustard yellow, pale sandy beige/cream, restrained golden ochre, earthy brick red and wine/burgundy. Make a clear change away from the original orange/gold wash: large wall faces PALE SAND BEIGE, yellow accent moldings, muted brick red structural bases and burgundy outlines/carved musical notation. Flat matte 2D cartoon colors, no glossy orange lighting, no new hues. No blue/green/purple. Preserve the input alpha and output true transparent RGBA: empty window holes and gutters alpha=0, walls and frames opaque. Some viewers show hidden brown RGB behind input alpha; those brown window interiors are NOT material and must remain fully transparent, not colored in. Do not add/remove geometry or change composition. No text, no palette swatches drawn in output, no scenery.

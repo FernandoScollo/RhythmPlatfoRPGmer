@@ -19,7 +19,6 @@ public class UnMuteSpecialChannels : MonoBehaviour
     }
     private IEnumerator FadeInVolume()
     {
-        Debug.Log("Me ejecuto");
         isFading = true;
         float startVolume;
         audioMixer.GetFloat(exposedParam, out startVolume);

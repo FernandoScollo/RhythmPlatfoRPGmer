@@ -1,281 +1,105 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class RhythmPlatforms : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private BoxCollider2D platformCollider;
-
-    [Header("Player")]
     [SerializeField] private Transform player;
-
-    [Header("Player Ejection")]
-    [SerializeField] private float ejectionDuration = 0.15f;
-    [SerializeField] private float pushSpeed = 8f;
-    [SerializeField] private float exitMargin = 0.2f;
-
+    [Header("Safe separation")]
+    [SerializeField, Min(0.01f)] private float exitMargin = 0.05f;
+    [SerializeField, Min(0.001f)] private float penetrationTolerance = 0.005f;
+    public UnityEvent<GameObject> OnPlayerEjected = new UnityEvent<GameObject>();
     private Rigidbody2D playerBody;
     private Collider2D playerCollider;
-
-    private bool hasEjectedPlayer;
-    private Coroutine ejectionCoroutine;
+    private MLPlayerMovement movement;
+    private bool activated;
 
     private void Awake()
     {
-        if (platformCollider == null)
+        if (platformCollider == null) platformCollider = GetComponent<BoxCollider2D>();
+        ResolvePlayer();
+    }
+    private void ResolvePlayer()
+    {
+        if (player == null)
         {
-            platformCollider = GetComponent<BoxCollider2D>();
+            GameObject found = GameObject.FindGameObjectWithTag("Player");
+            if (found != null) player = found.transform;
         }
-
-        GameObject playerObject =
-            GameObject.FindGameObjectWithTag("Player");
-
-        if (playerObject != null)
-        {
-            player = playerObject.transform;
-
-            playerBody =
-                playerObject.GetComponent<Rigidbody2D>();
-
-            playerCollider =
-                playerObject.GetComponent<Collider2D>();
-        }
+        if (player == null) return;
+        playerBody = player.GetComponent<Rigidbody2D>();
+        playerCollider = player.GetComponent<Collider2D>();
+        movement = player.GetComponent<MLPlayerMovement>();
     }
 
-    // =====================================================
-    // PREPARE FOR ACTIVATION
-    // =====================================================
-
+    // True means activation was handled here, never delayed.
     public bool PrepareForActivation()
     {
-        if (hasEjectedPlayer)
-            return false;
+        if (platformCollider == null) return false;
+        platformCollider.enabled = true;
+        if (activated) return true;
+        activated = true;
+        if (playerBody == null || movement == null) ResolvePlayer();
+        if (playerBody == null || playerCollider == null || movement == null) return true;
+        Physics2D.SyncTransforms();
+        ColliderDistance2D overlap = platformCollider.Distance(playerCollider);
+        if (!overlap.isValid || !overlap.isOverlapped || overlap.distance >= -penetrationTolerance)
+            return true; // Standing on top is not crushing.
 
-        if (player == null)
-            return false;
-
-        if (platformCollider == null)
-            return false;
-
-        if (playerCollider == null)
-            return false;
-
-        Bounds platformBounds = GetPlatformBounds();
-
-        if (!IsPlayerInside(platformBounds))
-            return false;
-
-        hasEjectedPlayer = true;
-
-        ejectionCoroutine =
-            StartCoroutine(EjectPlayer(platformBounds));
-
+        if (movement.IsPlatformFrozen || !TryFindExit(out Vector2 destination))
+            movement.FreezeByPlatform(platformCollider);
+        else
+        {
+            movement.CancelExternalMotion();
+            playerBody.position = destination; // Sweep and destination both validated.
+            Physics2D.SyncTransforms();
+        }
+        OnPlayerEjected.Invoke(player.gameObject);
         return true;
     }
 
-    // =====================================================
-    // RESET
-    // =====================================================
-
+    private bool TryFindExit(out Vector2 destination)
+    {
+        Bounds p = playerCollider.bounds;
+        Bounds b = platformCollider.bounds;
+        float margin = Mathf.Max(0.01f, exitMargin);
+        Vector2[] offsets = {
+            Vector2.up * (b.max.y - p.min.y + margin),
+            Vector2.left * (p.max.x - b.min.x + margin),
+            Vector2.right * (b.max.x - p.min.x + margin),
+            Vector2.down * (p.max.y - b.min.y + margin)
+        };
+        for (int i = 1; i < offsets.Length; i++)
+            for (int j = i; j > 0 && offsets[j].sqrMagnitude < offsets[j-1].sqrMagnitude; j--)
+            { Vector2 swap = offsets[j]; offsets[j] = offsets[j-1]; offsets[j-1] = swap; }
+        int mask = Physics2D.GetLayerCollisionMask(playerCollider.gameObject.layer);
+        float skin = Mathf.Min(0.005f, Mathf.Min(p.extents.x, p.extents.y) * 0.1f);
+        Vector2 size = (Vector2)p.size - Vector2.one * skin * 2f;
+        foreach (Vector2 offset in offsets)
+        {
+            bool blocked = false;
+            foreach (RaycastHit2D hit in Physics2D.BoxCastAll(p.center, size, 0f,
+                offset.normalized, offset.magnitude, mask))
+                if (Blocks(hit.collider)) { blocked = true; break; }
+            if (blocked) continue;
+            foreach (Collider2D other in Physics2D.OverlapBoxAll((Vector2)p.center + offset, size, 0f, mask))
+                if (Blocks(other)) { blocked = true; break; }
+            if (!blocked) { destination = playerBody.position + offset; return true; }
+        }
+        destination = playerBody.position;
+        return false;
+    }
+    private bool Blocks(Collider2D other)
+    {
+        return other != null && other != platformCollider && !other.isTrigger &&
+            other.attachedRigidbody != playerBody && !Physics2D.GetIgnoreCollision(playerCollider, other);
+    }
     public void ResetActivation()
     {
-        hasEjectedPlayer = false;
-
-        if (ejectionCoroutine != null)
-        {
-            StopCoroutine(ejectionCoroutine);
-            ejectionCoroutine = null;
-        }
-
-        if (platformCollider != null)
-        {
-            platformCollider.enabled = false;
-        }
+        activated = false;
+        if (platformCollider != null) platformCollider.enabled = false;
+        if (movement != null) movement.ReleasePlatform(platformCollider);
     }
-
-    // =====================================================
-    // GET PLATFORM BOUNDS
-    // =====================================================
-
-    private Bounds GetPlatformBounds()
-    {
-        Vector2 worldCenter =
-            transform.TransformPoint(
-                platformCollider.offset
-            );
-
-        Vector2 worldSize =
-            Vector2.Scale(
-                platformCollider.size,
-                transform.lossyScale
-            );
-
-        return new Bounds(
-            worldCenter,
-            worldSize
-        );
-    }
-
-    // =====================================================
-    // PLAYER INSIDE
-    // =====================================================
-
-    private bool IsPlayerInside(Bounds platformBounds)
-    {
-        Bounds playerBounds =
-            playerCollider.bounds;
-
-        return platformBounds.Intersects(
-            playerBounds
-        );
-    }
-
-    // =====================================================
-    // EJECT PLAYER
-    // =====================================================
-
-    private IEnumerator EjectPlayer(
-        Bounds platformBounds)
-    {
-        float distanceToLeft =
-            Mathf.Abs(
-                player.position.x -
-                platformBounds.min.x
-            );
-
-        float distanceToRight =
-            Mathf.Abs(
-                platformBounds.max.x -
-                player.position.x
-            );
-
-        int direction;
-
-        if (distanceToLeft < distanceToRight)
-        {
-            direction = -1;
-        }
-        else
-        {
-            direction = 1;
-        }
-
-        // Calculamos cuánto necesita recorrer
-        // el Player para quedar completamente
-        // fuera de la plataforma.
-
-        float playerHalfWidth =
-            playerCollider.bounds.extents.x;
-
-        float requiredDistance;
-
-        if (direction < 0)
-        {
-            requiredDistance =
-                player.position.x -
-                platformBounds.min.x +
-                playerHalfWidth +
-                exitMargin;
-        }
-        else
-        {
-            requiredDistance =
-                platformBounds.max.x -
-                player.position.x +
-                playerHalfWidth +
-                exitMargin;
-        }
-
-        // Calculamos la velocidad necesaria para
-        // recorrer esa distancia durante la duración
-        // de la expulsión.
-
-        float requiredSpeed =
-            requiredDistance /
-            ejectionDuration;
-
-        float finalSpeed =
-            Mathf.Max(
-                pushSpeed,
-                requiredSpeed
-            );
-
-        float originalVelocityX =
-            playerBody.velocity.x;
-
-        float elapsedTime = 0f;
-
-        // La plataforma todavía NO tiene collider.
-        // El Player puede atravesar su espacio
-        // durante esta expulsión.
-
-        while (elapsedTime < ejectionDuration)
-        {
-            playerBody.velocity =
-                new Vector2(
-                    direction * finalSpeed,
-                    playerBody.velocity.y
-                );
-
-            elapsedTime += Time.fixedDeltaTime;
-
-            yield return new WaitForFixedUpdate();
-        }
-
-        // Nos aseguramos de que el Player haya
-        // salido completamente de la plataforma.
-
-        float finalX;
-
-        if (direction < 0)
-        {
-            finalX =
-                platformBounds.min.x -
-                playerHalfWidth -
-                exitMargin;
-        }
-        else
-        {
-            finalX =
-                platformBounds.max.x +
-                playerHalfWidth +
-                exitMargin;
-        }
-
-        // Solo corregimos si por alguna razón
-        // la física no llegó suficientemente lejos.
-        // Esto evita el atrapamiento.
-
-        if (direction < 0 &&
-            playerBody.position.x > finalX)
-        {
-            playerBody.position =
-                new Vector2(
-                    finalX,
-                    playerBody.position.y
-                );
-        }
-        else if (direction > 0 &&
-                 playerBody.position.x < finalX)
-        {
-            playerBody.position =
-                new Vector2(
-                    finalX,
-                    playerBody.position.y
-                );
-        }
-
-        // Recuperamos el movimiento normal.
-        playerBody.velocity =
-            new Vector2(
-                originalVelocityX,
-                playerBody.velocity.y
-            );
-
-        // Ahora sí aparece físicamente la plataforma.
-        platformCollider.enabled = true;
-
-        ejectionCoroutine = null;
-    }
+    private void OnDisable() { ResetActivation(); }
 }

@@ -42,6 +42,15 @@ public class Enemy_Sideways : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        collision.GetComponent<Health>().TakeDamage(damage);
+        MLHealth mlHealth = collision.GetComponentInParent<MLHealth>();
+
+        if (mlHealth != null)
+        {
+            mlHealth.TakeDamage(damage);
+        }
+        else
+        {
+            collision.GetComponentInParent<Health>()?.TakeDamage(damage);
+        }
     }
 }

@@ -12,28 +12,73 @@ public class PlayerBomboDashSkill : MonoBehaviour
     [SerializeField] private float dashBrakeStrength = 50f;
 
     [Header("Events")]
-    public UnityEvent OnDashStarted;
-    public UnityEvent OnDashFinished;
+    public UnityEvent OnDashStarted = new UnityEvent();
+    public UnityEvent OnDashFinished = new UnityEvent();
 
     private Rigidbody2D body;
     private MLPlayerMovement playerMovement;
+    private MLHealth health;
+    private MLPlayerStats playerStats;
+    private float BomboDashForce => playerStats != null ? playerStats.BomboDashForce : dashForce;
+    private float BomboVerticalDashForce => playerStats != null ? playerStats.BomboVerticalDashForce : verticalDashForce;
+    private float BomboDashDuration => playerStats != null ? playerStats.BomboDashDuration : dashDuration;
+    private float BomboDashBrakeStrength => playerStats != null ? playerStats.BomboDashBrakeStrength : dashBrakeStrength;
 
     private bool isDashing;
+    private PlayerDashSkill otherDash;
+    private float readyAt, activeCooldown;
+    public float CooldownRemaining => Mathf.Max(0f, readyAt - Time.time);
+    public float CooldownProgress => activeCooldown <= 0f ? 1f : 1f - Mathf.Clamp01(CooldownRemaining / activeCooldown);
 
     public bool IsDashing => isDashing;
+    public float DashDirection { get; private set; }
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         playerMovement = GetComponent<MLPlayerMovement>();
+        health = GetComponent<MLHealth>();
+        playerStats = GetComponent<MLPlayerStats>();
+        otherDash = GetComponent<PlayerDashSkill>();
+    }
+
+    private void OnEnable()
+    {
+        if (health != null) health.OnDied.AddListener(CancelDash);
+    }
+
+    private void OnDisable()
+    {
+        if (health != null) health.OnDied.RemoveListener(CancelDash);
+        CancelDash();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(dashKey) && !isDashing && !playerMovement.IsDashActive)
-        {
-            StartCoroutine(Dash());
-        }
+        if (Input.GetKeyDown(dashKey)) TryDash();
+    }
+
+    public bool TryDash()
+    {
+        if (!isActiveAndEnabled || Time.timeScale <= 0f || isDashing || CooldownRemaining > 0f ||
+            !playerMovement.isActiveAndEnabled || playerMovement.IsKnockbackActive ||
+            playerMovement.IsPlatformFrozen || (health != null && health.IsDead)) return false;
+        // Reject unknown movement locks, but allow replacing the other dash.
+        if (playerMovement.IsDashActive && (otherDash == null || !otherDash.IsDashing)) return false;
+        if (otherDash != null) otherDash.CancelDash();
+        activeCooldown = Mathf.Max(0f, playerStats != null ? playerStats.BomboDashCooldown : 2f);
+        readyAt = Time.time + activeCooldown;
+        StartCoroutine(Dash());
+        return true;
+    }
+
+    public void CancelDash()
+    {
+        if (!isDashing) return;
+        StopAllCoroutines();
+        isDashing = false;
+        playerMovement.SetDashActive(false);
+        OnDashFinished?.Invoke();
     }
 
     private IEnumerator Dash()
@@ -42,20 +87,21 @@ public class PlayerBomboDashSkill : MonoBehaviour
 
         playerMovement.SetDashActive(true);
 
+        DashDirection = Mathf.Sign(transform.localScale.x);
         OnDashStarted?.Invoke();
 
         // Dash hacia donde mira el Player
-        float dashDirection = Mathf.Sign(transform.localScale.x);
+        float dashDirection = DashDirection;
 
         // Velocidad inicial del dash
         body.velocity = new Vector2(
-            dashDirection * dashForce,
-            body.velocity.y + verticalDashForce
+            dashDirection * BomboDashForce,
+            body.velocity.y + BomboVerticalDashForce
         );
 
         float elapsedTime = 0f;
 
-        while (elapsedTime < dashDuration)
+        while (elapsedTime < BomboDashDuration)
         {
             float horizontalInput = Input.GetAxisRaw("Horizontal");
 
@@ -67,7 +113,7 @@ public class PlayerBomboDashSkill : MonoBehaviour
                 float newVelocityX = Mathf.MoveTowards(
                     body.velocity.x,
                     0f,
-                    dashBrakeStrength * Time.deltaTime
+                    BomboDashBrakeStrength * Time.deltaTime
                 );
 
                 body.velocity = new Vector2(

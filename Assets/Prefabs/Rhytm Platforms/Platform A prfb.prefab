@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2716399641021450293}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Platform A prfb
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 8720512987625153223}
   - component: {fileID: 6478292114763452579}
   - component: {fileID: 686174602845066759}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Square Outline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,7 +144,8 @@ GameObject:
   - component: {fileID: 6453886525080821910}
   - component: {fileID: 8072272673904493466}
   - component: {fileID: 3861948012377712820}
-  m_Layer: 6
+  - component: {fileID: 8474917255067142861}
+  m_Layer: 7
   m_Name: Platform A
   m_TagString: Rhythm Platform
   m_Icon: {fileID: 0}
@@ -276,3 +277,19 @@ MonoBehaviour:
   ejectionDuration: 0.07
   pushSpeed: 8
   exitMargin: 0.2
+  OnPlayerEjected:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &8474917255067142861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6283924352432465091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7d4c963d13b4dcbbcc3871325214879, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 1

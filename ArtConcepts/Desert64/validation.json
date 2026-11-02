@@ -1,0 +1,31 @@
+{
+  "tile_size": [
+    64,
+    64
+  ],
+  "atlas_size": [
+    256,
+    256
+  ],
+  "tiles_per_atlas": 16,
+  "base_uniform": true,
+  "overlay_transparent": true,
+  "colors": [
+    "#FFE59A",
+    "#FFD16D",
+    "#F6BA50",
+    "#EAA03C",
+    "#EE963E",
+    "#E58032",
+    "#DB692D",
+    "#C8572D",
+    "#BA4E36",
+    "#A34440",
+    "#903B48",
+    "#7A354B",
+    "#69304B",
+    "#552A46",
+    "#43243E",
+    "#322035"
+  ]
+}

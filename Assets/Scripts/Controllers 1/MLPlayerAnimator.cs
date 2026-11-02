@@ -10,6 +10,8 @@ public class MLPlayerAnimator : MonoBehaviour
     [SerializeField] private MLPlayerMovement playerMovement;
     [SerializeField] private PlayerDashSkill guitarDashSkill;
     [SerializeField] private PlayerBomboDashSkill bomboDashSkill;
+    [SerializeField] private PlayerBomboJumpSkill bomboJumpSkill;
+    [SerializeField] private string bomboJumpState = "Bombo Jump";
 
     [Header("Basic Animation States")]
     [SerializeField] private string idleState = "Idle";
@@ -31,6 +33,8 @@ public class MLPlayerAnimator : MonoBehaviour
     [SerializeField] private float landTransitionDuration = 0.12f;
 
     private string currentState;
+    private bool platformAnimationFrozen;
+    private float speedBeforePlatformFreeze;
 
     private bool guitarDashAnimationFinished;
     private bool bomboDashAnimationFinished;
@@ -48,11 +52,19 @@ public class MLPlayerAnimator : MonoBehaviour
 
         if (bomboDashSkill == null)
             bomboDashSkill = GetComponent<PlayerBomboDashSkill>();
+        if (bomboJumpSkill == null)
+            bomboJumpSkill = GetComponent<PlayerBomboJumpSkill>();
     }
 
     private void OnEnable()
     {
-        if (playerMovement != null)
+        if (bomboJumpSkill != null)
+        {
+            bomboJumpSkill.OnGroundJump.AddListener(HandleJump);
+            bomboJumpSkill.OnAirJump.AddListener(HandleAirJump);
+            bomboJumpSkill.OnLanded.AddListener(HandleLand);
+        }
+        else if (playerMovement != null)
         {
             playerMovement.OnJump.AddListener(HandleJump);
             playerMovement.OnLand.AddListener(HandleLand);
@@ -83,7 +95,13 @@ public class MLPlayerAnimator : MonoBehaviour
 
     private void OnDisable()
     {
-        if (playerMovement != null)
+        if (bomboJumpSkill != null)
+        {
+            bomboJumpSkill.OnGroundJump.RemoveListener(HandleJump);
+            bomboJumpSkill.OnAirJump.RemoveListener(HandleAirJump);
+            bomboJumpSkill.OnLanded.RemoveListener(HandleLand);
+        }
+        else if (playerMovement != null)
         {
             playerMovement.OnJump.RemoveListener(HandleJump);
             playerMovement.OnLand.RemoveListener(HandleLand);
@@ -117,16 +135,36 @@ public class MLPlayerAnimator : MonoBehaviour
         PlayAnimation(idleState);
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (animator == null || playerMovement == null)
             return;
+
+        if (playerMovement.IsPlatformFrozen)
+        {
+            if (!platformAnimationFrozen) speedBeforePlatformFreeze = animator.speed;
+            platformAnimationFrozen = true;
+            animator.speed = 0f;
+            return;
+        }
+        if (platformAnimationFrozen)
+        {
+            platformAnimationFrozen = false;
+            animator.speed = speedBeforePlatformFreeze;
+        }
 
         UpdateAnimationState();
     }
 
     private void UpdateAnimationState()
     {
+        // Walking off an edge (or leaving a landing animation) must enter the air state.
+        if (!playerMovement.IsGrounded &&
+            (currentState == idleState || currentState == walkState || currentState == landState))
+        {
+            PlayAnimation(airJumpState);
+            return;
+        }
         // =================================================
         // GUITAR DASH
         // =================================================
@@ -209,12 +247,12 @@ public class MLPlayerAnimator : MonoBehaviour
         // JUMP
         // =================================================
 
-        if (currentState == jumpState)
+        if (currentState == jumpState || currentState == bomboJumpState)
         {
             AnimatorStateInfo stateInfo =
                 animator.GetCurrentAnimatorStateInfo(0);
 
-            if (stateInfo.IsName(jumpState) &&
+            if (!animator.IsInTransition(0) && stateInfo.IsName(currentState) &&
                 stateInfo.normalizedTime >= 1f)
             {
                 PlayAnimation(airJumpState);
@@ -275,6 +313,15 @@ public class MLPlayerAnimator : MonoBehaviour
     // =====================================================
     // LAND
     // =====================================================
+
+    private void HandleAirJump()
+    {
+        if (animator == null || IsDashing()) return;
+        animator.speed = 1f;
+        currentState = bomboJumpState;
+        // Restart the animation even for consecutive third/fourth jumps.
+        animator.Play(bomboJumpState, 0, 0f);
+    }
 
     private void HandleLand()
     {
@@ -350,6 +397,11 @@ public class MLPlayerAnimator : MonoBehaviour
 
     private void GoToGroundAnimation()
     {
+        if (!playerMovement.IsGrounded)
+        {
+            PlayAnimation(airJumpState);
+            return;
+        }
         if (playerMovement.IsMoving)
         {
             PlayAnimation(

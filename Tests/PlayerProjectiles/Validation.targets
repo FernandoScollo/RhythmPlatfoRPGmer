@@ -1,0 +1,12 @@
+<Project>
+  <Import Project="..\ProjectileShooter\Validation.targets" />
+  <ItemGroup>
+    <Compile Remove="$(MSBuildProjectDirectory)\Assets\Scripts\Player\MLPlayerSkillUI.cs;Assets\Scripts\Player\MLPlayerSkillUI.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Assets\Scripts\Player\MLPlayerSkillUI.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\Assets\Scripts\Health\MLEnemyHealthUI.cs;Assets\Scripts\Health\MLEnemyHealthUI.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Assets\Scripts\Health\MLEnemyHealthUI.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\Assets\Scripts\Player\PlayerSkillProjectile.cs;Assets\Scripts\Player\PlayerSkillProjectile.cs;$(MSBuildProjectDirectory)\Assets\Scripts\Player\PlayerSkillProjectileEmitter.cs;Assets\Scripts\Player\PlayerSkillProjectileEmitter.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Assets\Scripts\Player\PlayerSkillProjectile.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Assets\Scripts\Player\PlayerSkillProjectileEmitter.cs" />
+  </ItemGroup>
+</Project>

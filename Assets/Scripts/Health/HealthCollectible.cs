@@ -12,8 +12,21 @@ public class HealthCollectible : MonoBehaviour
     {
         if(collision.tag == "Player")
         {
-            collision.GetComponent<Health>().AddHealth(healthValue);
-            gameObject.SetActive(false);
+            MLHealth mlHealth = collision.GetComponentInParent<MLHealth>();
+
+            if (mlHealth != null && mlHealth.Heal(healthValue))
+            {
+                gameObject.SetActive(false);
+                return;
+            }
+
+            Health health = collision.GetComponentInParent<Health>();
+
+            if (health != null)
+            {
+                health.AddHealth(healthValue);
+                gameObject.SetActive(false);
+            }
         }
     }
 }

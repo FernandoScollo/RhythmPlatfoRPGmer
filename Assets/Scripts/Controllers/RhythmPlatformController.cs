@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class RhythmPlatformController : MonoBehaviour
 {
@@ -33,6 +34,15 @@ public class RhythmPlatformController : MonoBehaviour
     [SerializeField] private List<GameObject> C_Platforms;
 
     // =====================================================
+    // ACTIVATION EVENTS
+    // =====================================================
+
+    [Header("Platform Activation Events")]
+    public UnityEvent OnPlatformsAActivated = new UnityEvent();
+    public UnityEvent OnPlatformsBActivated = new UnityEvent();
+    public UnityEvent OnPlatformsCActivated = new UnityEvent();
+
+    // =====================================================
     // STATES
     // =====================================================
 
@@ -41,6 +51,8 @@ public class RhythmPlatformController : MonoBehaviour
 
     private bool platformsAActive;
     private bool platformsBActive;
+    // Read the actual platform state, not a second threshold calculation.
+    public bool ProjectileMovementAllowed => isActiveAndEnabled && platformsAActive && !platformsBActive;
     private bool platformsCActive;
 
     // =====================================================
@@ -150,6 +162,8 @@ public class RhythmPlatformController : MonoBehaviour
 
         if (isActive && !platformsAActive)
         {
+            OnPlatformsAActivated?.Invoke();
+
             foreach (GameObject platform in A_Platforms)
             {
                 RhythmPlatforms ejection =
@@ -236,6 +250,8 @@ public class RhythmPlatformController : MonoBehaviour
 
         if (isActive && !platformsBActive)
         {
+            OnPlatformsBActivated?.Invoke();
+
             foreach (GameObject platform in B_Platforms)
             {
                 RhythmPlatforms ejection =
@@ -319,6 +335,8 @@ public class RhythmPlatformController : MonoBehaviour
 
         if (isActive && !platformsCActive)
         {
+            OnPlatformsCActivated?.Invoke();
+
             foreach (GameObject platform in C_Platforms)
             {
                 RhythmPlatforms ejection =
